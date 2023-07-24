@@ -1,7 +1,9 @@
 const express = require("express");
+const connectDb = require("./config/connectDb");
 const morgan = require("morgan");
 
 require("dotenv").config();
+connectDb();
 
 const app = express();
 app.use(morgan('dev'));
