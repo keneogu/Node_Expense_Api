@@ -37,20 +37,26 @@ const userSchema = mongoose.Schema({
     minlength: [6, "Password too short, must be longer than 6 char"],
     select: false,
   },
-  avatar: {
-    public_id: {
-      type: String,
-      required: true,
-    },
-    url: {
-      type: String,
-      required: true,
-    },
-  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
+userSchema.pre('save', async function (next) {
+  if(!this.isModified('password')) {
+    next()
+  }
+
+  this.password = await bcrypt.hash(this.password, 10)
+})
+
+userSchema.methods.getJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.SECRET_TOKEN, { expiresIn: "7d" });
+};
+
+userSchema.methods.comparePassword = async function (pass) {
+  return await bcrypt.compare(pass, this.password);
+};
 
 module.exports = mongoose.model("User", userSchema);
