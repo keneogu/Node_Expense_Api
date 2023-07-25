@@ -35,5 +35,31 @@ const registerUser = asyncHandler(async (req, res) => {
   tokenHandler(user, 200, res);
 });
 
+const loginUser = asyncHandler(async (req, res) => {
+  const { username, email, password } = req.body;
 
-module.exports = { registerUser };
+  const user = await User.findOne({
+    $or: [
+      {
+        email,
+      },
+      {
+        username,
+      },
+    ],
+  }).select("+password");
+  if (!user) {
+    res.status(401);
+    throw new Error("username/email is not valid");
+  }
+
+  const isPassword = await user.comparePassword(password);
+  if (!isPassword) {
+    res.status(401);
+    throw new Error("Incorrect Password");
+  }
+
+  tokenHandler(user, 200, res);
+});
+
+module.exports = { registerUser, loginUser };
