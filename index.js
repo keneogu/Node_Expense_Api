@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/v1", require("./routes/transactionRoutes"));
 
 const port = process.env.PORT || 8080;
 
