@@ -12,4 +12,30 @@ const getTransactions = asyncHandler(async (req,res) => {
 	})
 })
 
+const createTransaction = asyncHandler(async(req,res) => {
+
+	const {amount, category, type, desc} = req.body
+
+	// const transaction = await Transaction.create(req.body)
+	if(!amount || !category || !type || !desc) {
+		res.status(400)
+		throw new Error("All fields are mandatory")
+	}
+
+	const transaction = await Transaction.create({
+		amount,
+		category,
+		type,
+		desc,
+		user_id: req.user.id
+	})
+
+	console.log(req.user)
+	res.status(201).json({
+		success: true,
+		data: transaction
+	});
+
+})
+
 module.exports = {getTransactions, createTransaction}
